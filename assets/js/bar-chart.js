@@ -12,9 +12,10 @@ function drawBarChart(data, options, element) { // Draw Chart.
   if(!errorCheck) {
     return;
   }
-  var chartOptions = (options === '') ? new getOptions(data) : setOptions(data, options);
+  var chartOptions = (options === '') ? new Options(data) : setOptions(data, options);
 
-  console.log(chartOptions);
+  //console.log(chartOptions);
+  console.log(chartOptions.barHeights(data));
   return 'Complete';
 }
 
@@ -36,53 +37,76 @@ function checkErrors(errorCheck, dataCheck) {
   return true;
 }
 
-function getOptions (data) {
+function Options (data) {
 // Get Default options for Charts.
 // Note: Object Constructor Function
 
-    // Bar Titles
-    this.title = 'Chart';
-    this.xAxis = 'X Axis';
-    this.yAxis = 'Y Axis';
+  // Bar Titles
+  this.title = 'Chart';
+  this.xAxis = 'X Axis';
+  this.yAxis = 'Y Axis';
 
-    // Color Schemes
-    this.barColor = "#429ef4";
-    this.barLabelColor = '#fff';
-    this.labelColor = "#666";
-    this.axisColor = "#000";
-    this.chartBGColor = "#fff";
+  // Chart Type
+  this.style = 'single'; // Accepts Single or Stacked.
 
-    // Chart & Bar Dimensions
-    this.padding = 16;
-    this.height = 300;
-    this.width = (window.innerWidth * 0.8) + this.padding; // 80% of browser element width.
-    this.barWidth = Math.floor( this.width / (data.length * 2) ); // Get total data length and account for space.
-    this.spacing = this.barWidth; // Spacing to separate bars.
+  // Color Schemes
+  this.barColor = "#429ef4";
+  this.barLabelColor = '#fff';
+  this.labelColor = "#666";
+  this.axisColor = "#000";
+  this.chartBGColor = "#fff";
 
-    // Functions
-    this.barHeights = function (data) {
+  // Chart & Bar Dimensions
+  this.padding = 16;
+  this.height = 300;
+  this.width = 400;
+  this.barWidth = Math.floor( this.width / (data.length * 2) ); // Get total data length and account for space.
+  this.spacing = this.barWidth; // Spacing to separate bars.
+
+  this.barHeights = function (data) { // Need to fix this part. Returns undefined and does nothing...
       var dataHeights = [];
+      var height = this.height * 0.95;
+      var maxValue = absoluteMax(data); // Get highest value within data.
+
       for (var i in data) {
         if(Array.isArray(data[i])) {
           // Enter second layer of Array
+          dataHeights.push([]);
           for (var x in data[i]) {
-            dataHeights[i].push(Math.floor(this.height * ( this.height / data[i][x] ) ) ); // Add dataHeights array total.
+            dataHeights[i].push( Math.floor( height * ( data[i][x] / maxValue ) ) ); // Add dataHeights array total.
           }
         } else {
-          dataHeights.push(Math.floor( this.height ( this.height / data[i] ) ) ); // Add height to dataHeights array total.
+          dataHeights.push( Math.floor( height * ( data[i] / maxValue ) ) ); // Add height to dataHeights array total.
         }
       }
-      console.log(dataHeights);
       return dataHeights;
-    }
+    };
 
+}
+
+function absoluteMax(data) {
+  // (data === [1,2,3] || data === [[1,2,3], 2, [1,2,3]]) ?
+  // If data contains arrays, check all arrays and find the max within them, then compare the absolute highest and return it.
+  var maxCollection = [];
+  var max = data.map( x => jQuery.type(x) === 'array').includes(true); // Determines if an array is present in data.
+  if(max) {
+    for (var i in data) {
+      if(Array.isArray(data[i])) {
+        maxCollection.push(Math.max(...data[i]));
+      } else {
+        maxCollection.push(data[i]);
+      }
+    }
+    return Math.max(...maxCollection); // Return highest out of all numbers.
+  }
+  return Math.max(...data); // If there are no arrays, return the max.
 }
 
 function setOptions (data, options) {
   // Set User options for Charts.
-  var defaults = new getOptions(data);
+  var defaults = new Options(data);
 
-
+  //(window.innerWidth * 0.8) + defaults.padding; // 80% of browser element width.
 }
 
 
@@ -90,8 +114,7 @@ function setOptions (data, options) {
 console.log(drawBarChart('data', {"name":"object"}, 'body'));
 console.log(drawBarChart([1,2,3], 'options', 'element'));
 console.log(drawBarChart([1,2,3], {"name":"object"}, 'element'));
-*/
-// console.log(drawBarChart(['a',2,3], {"name":"object"}, 'element'));
 console.log(drawBarChart([2,3], '', 'element'));
 console.log(drawBarChart([2,3,4,5,6,7,8,9], '', 'element'));
-console.log(drawBarChart([2,3,6,7,8], '', 'element'));
+*/
+console.log(drawBarChart([[1,2,3],3,6,7,8], '', 'element'));
