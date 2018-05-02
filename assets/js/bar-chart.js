@@ -17,15 +17,17 @@ function drawBarChart(data, options, element) { // Draw Chart.
   );
   // Get Default Chart settings or Create Custom Chart settings
   var chartOptions = (options === '') ? new Options(data) : setOptions(data, options);
+  var target = $(element); // Element to place the chart in.
 
   // Errors are found.
   if(!errorCheck || !chartOptions) {
     return;
   }
 
-  var target = $(element); // Element to place the chart in.
+  chartOptions.render(target, chartOptions.barHeights(data), isStackedData(data)); // Create Bar Chart
+
   //console.log(chartOptions);
-  console.log(chartOptions.barHeights(data));
+  //console.log(chartOptions.barHeights(data));
   return chartOptions;
 }
 
@@ -63,12 +65,12 @@ function Options (data) {
   this.theme = "default";
 
   // Chart & Bar Dimensions
-  this.usePercent =
+  this.usePercent = false;
   this.padding = 16;
   this.height = 300;
   this.width = 400;
-  this.barWidth = Math.floor( this.width / (data.length * 2) ); // Get total data length and account for space.
-  this.spacing = this.barWidth; // Spacing to separate bars.
+  this.barWidth = Math.floor( this.width / (data.length) ); // Get total data length and account for space.
+  this.spacing = this.barWidth / 2; // Spacing to separate bars.
 
   this.barHeights = function (data) { // Need to fix this part. Returns undefined and does nothing...
       var dataHeights = []; // Store bar heights
@@ -80,8 +82,6 @@ function Options (data) {
       } else {
         var maxValue = absoluteMax(data, false); // Single values: Get highest value within data.
       }
-      console.log("MaxValue: " + maxValue);
-
       for (var i in data) {
         if(isStacked) {
           // Enter second layer of Array
@@ -105,6 +105,60 @@ function Options (data) {
     return data.reduce(function (total, pos) { total + pos; } );
   }*/
 
+  this.render = function(target, heights, isStacked) {
+    var styleTag = $('<style></style>'); // Create element with jQuery
+    // Styling and chart styles to be stored.
+    var options = [
+    ".chart { margin: 1rem; display: block; width: 100%; height: 100%; max-width: " + this.width + "px !important; height: " + this.height + "px !important; }",
+    ".bar { width: " + this.barWidth + "px; display:inline-block; margin-left: " + this.padding + "px; }",
+    ".bar:first-child { margin-left: " + this.padding / 2 + "px; }"
+
+    ];
+    var barHeightClasses = []; // Array to store height classes
+    // Get each bar height and give it a class.
+    var barElements = [];
+    for (var i in heights) {
+      if(isStacked) {
+        barHeightClasses.push([]);
+        for (var x in heights[i]) {
+          if(x % 2 === 0) { // Tmp bg
+            var backgroundColor = "blue";
+          } else {
+            var backgroundColor = "forestgreen";
+          }
+          options.push('.b' + i + '-' + x + ' { height: ' + heights[i][x] + 'px; display: inline-block ; background-color: ' + backgroundColor + '; }');
+          options.push('.b' + i + '-' + x + '> b.value-center { top:' + ( ( heights[i][x] / 2 ) - 10) + 'px; }');
+          barHeightClasses[i].push('b' + i + '-' + x);
+        }
+      } else {
+        var backgroundColor = "forestgreen";
+        options.push('.b' + i + ' { height: ' + heights[i] + 'px; display: inline-block ; background-color: ' + backgroundColor + '; }');
+        barHeightClasses.push('.b' + i);
+      }
+    }
+    // create bar html elements
+    for (var i in barHeightClasses) {
+      if (isStacked) {
+        console.log(barHeightClasses);
+        var bar = "<div class='bar default'>\r\n";
+        for (var x in barHeightClasses[i]) { // Create
+          bar += "<span class='" + barHeightClasses[i][x] + " value-" + this.xValuesPos + " valueLabel'><b class='value-" + this.xValuesPos + " barLabelColor'>" + this.xValues[i][x] + "</b></span>\r\n";
+        }
+        bar += "</div>"
+        barElements.push(bar);
+      } else {
+        barElements.push("<div class='bar default" + barHeightClasses[i] + "'><span class='valueLabel'><b class='value-" + this.xValuesPos + " barLabelColor'>" + this.xValues[i] + "</b></span></div>");
+      }
+    }
+    barElements.join('\r\n');
+    options.join('\r\n');
+    styleTag.html(options);
+    // Add styling to new style element in head tag.
+    $('head').append(styleTag);
+    $(target).addClass('chart', 'default');
+    $(target).html(barElements);
+  }
+
 }
 
 function getXLabels(xLabels, length, customLabels) {
@@ -120,12 +174,14 @@ function getXLabels(xLabels, length, customLabels) {
     return false;
   } else {
     var isDefault = xLabels.map( x => typeof x ).includes('number');
-    if(isDefault) {
+    if(isDefault && customLabels !== true) {
       for (var i in xLabels) {
         labels.push("b" + i);
       }
     } else {
-      labels.push(xLabels[i]);
+      for (var i in xLabels) {
+        labels.push(xLabels[i]);
+      }
     }
   }
   return labels;
@@ -140,7 +196,7 @@ function setOptions (data, options) {
   }
   for (var property in options) {
     if(acceptableProperties.includes(property)) {
-      if(property === 'xLabels') {
+      if(property.search('xLabels') === 0) {
         chartOptions[property] = getXLabels(options[property], data.length, true); // Create new Labels
       } else {
         chartOptions[property] = options[property];
@@ -218,6 +274,6 @@ console.log(drawBarChart([1,2,3], {"name":"object"}, 'element'));
 console.log(drawBarChart([2,3], '', 'element'));
 console.log(drawBarChart([2,3,4,5,6,7,8,9], '', 'element'));
 */
-console.log("REGULAR: ", drawBarChart([3,6,7,8], '', 'element'));
-console.log("CUSTOM OPTIONS: ", drawBarChart([[3,6], [1,2,3], [7,8]], {width:500, height:400, padding: 32, xLabels: ['May', 'June', 'July']}, 'element')); // Test setOptions
-
+//console.log("REGULAR: ", drawBarChart([3,6,7,8], '', 'element'));
+console.log("CUSTOM OPTIONS: ", drawBarChart([[3,6], [1,2,3], [7,8]], {width:500, height:400, padding: 32, xLabels: ['May', 'June', 'July']}, '.bar-chart')); // Test setOptions
+console.log("CUSTOM OPTIONS: ", drawBarChart([[3,6], [1,2,3], [7,8]], {width:500, height:400, padding: 32, xLabels: [2016, 2017, 2018]}, 'element')); // Test setOptions

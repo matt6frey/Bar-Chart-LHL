@@ -2,7 +2,7 @@
   License: none (public domain)
 */
 
-html, body, div, span, applet, object, iframe,
+/*html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
 del, dfn, em, img, ins, kbd, q, s, samp,
@@ -23,7 +23,7 @@ time, mark, audio, video {
   vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure,
+/*article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display: block;
 }
@@ -44,7 +44,7 @@ q:before, q:after {
 table {
   border-collapse: collapse;
   border-spacing: 0;
-}
+}*/
 
 
 /* Bar Styling */
@@ -70,6 +70,23 @@ table {
   color: #666;
 }
 
+div.bar > span {
+    float: left;
+    display: block;
+    width: 100%;
+    bottom: -21px;
+    position: relative;
+    text-align: center;
+
+}
+
+div.bar > span > b {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  margin-left: -2%;
+}
+
 .bar {
   -webkit-transition: height 0.5s ease;
   -moz-transition: height 0.5s ease;
@@ -77,9 +94,16 @@ table {
   transition: height 0.5s ease;
 }
 
-.barLabelColor .default {
+b.barLabelColor {
   color: #fff;
-  font-weight: bold;
+}
+
+.value-top {
+  top: 1rem;
+}
+
+.value-bottom {
+  bottom: 1rem;
 }
 
 .stacked {}
