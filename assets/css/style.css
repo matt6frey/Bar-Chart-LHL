@@ -47,3 +47,49 @@ table {
 }
 
 
+/* Bar Styling */
+
+.chart {
+  border-left: 3px solid #000;
+  border-bottom: 3px solid #000;
+}
+
+.chart .negatives {
+
+}
+
+
+.default {}
+
+.bar .default {
+  background-color: #429ef4;
+
+}
+
+.bar .label .default {
+  color: #666;
+}
+
+.bar {
+  -webkit-transition: height 0.5s ease;
+  -moz-transition: height 0.5s ease;
+  -o-transition: height 0.5s ease;
+  transition: height 0.5s ease;
+}
+
+.barLabelColor .default {
+  color: #fff;
+  font-weight: bold;
+}
+
+.stacked {}
+
+
+/*this.barColor = "#429ef4";
+  this.barLabelColor = '#fff';
+  this.labelColor = "#666";
+  this.axisColor = "#000";
+  this.chartBGColor = "#fff";*/
+
+
+
