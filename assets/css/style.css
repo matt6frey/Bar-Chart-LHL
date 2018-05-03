@@ -23,7 +23,6 @@ h2.chartHeader {
 span.label {
   color: #666;
   display: inline-block;
-  outline: solid 1px black;
   padding: 0.5rem;
   transform: rotate(-45deg);
   transform-origin: right top;
@@ -57,16 +56,9 @@ div.yAxis {
   text-align: center;
 }
 
-.default {}
-
-div.bar {
-  vertical-align: bottom;
-}
-
 div.bar.default {
   background-color: #429ef4;
 }
-
 
 div.bar > span {
   float: left;
@@ -100,6 +92,14 @@ b.barLabelColor {
 .value-bottom {
   bottom: 1rem;
 }
+
+.inline-block {
+  display: inline-block;
+  margin-left: 2rem;
+}
+
+
+
 
 /*this.barColor = "#429ef4";
   this.barLabelColor = '#fff';

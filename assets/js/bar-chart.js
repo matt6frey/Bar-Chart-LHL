@@ -57,6 +57,7 @@ function Options (data) {
   this.xValues = data;
   this.xValuesPos = 'center'; // Center: Default. Accepts Top or Bottom as well.
   this.yAxis = 'Y Axis';
+  this.yLabels = getYLabels(absoluteMax(data));
 
   // Chart Theme (Controls theme colors: ensures either default classes are used or custom classes are used)
   this.theme = "default";
@@ -68,13 +69,9 @@ function Options (data) {
   this.barWidth = Math.floor( ( ( this.width / (data.length * 2 ) ) / this.width ) * 100 ) ; // Get total data length and account for space.
   this.spacing = this.barWidth; // Spacing to separate bars.
 
-  //this.spacing = (data.length > 10) ? ( this.width - ( this.barWidth * data.length ) ) / data.length : ( this.width - ( this.barWidth * data.length ) ) / ( data.length * 2 ); // Spacing to separate bars.
-  console.log(this.barWidth, this.spacing)
-
   this.barHeights = function (data) {
       var dataHeights = []; // Store bar heights
       var height = this.height * 0.95;
-      //var maxValue = absoluteMax(data); // Check for stacked values or single values, and Get highest value within data.
       var isStacked = isStackedData(data);
       if(isStacked) {
         var maxValue = absoluteMax(data, true); // Stacked values: Get highest value within data.
@@ -98,27 +95,27 @@ function Options (data) {
       return dataHeights;
     };
 
-  /*this.dataMax = absoluteMax(data);
+  this.dataMax = absoluteMax(data);
   this.dataMin = absoluteMin(data);
-  this.dataAverage = function () {
+  /*this.dataAverage = function () {
     return data.reduce(function (total, pos) { total + pos; } );
   }*/
 
   this.render = function(target, heights, isStacked, chartOptions) {
     var styleTag = $('<style></style>'); // Create element with jQuery
     // Styling and chart styles to be stored.
-    var buffer = chartOptions.topBuffer;
+    var buffer = this.topBuffer;
     //console.log(buffer);
-    var options = [
-    ".chart { max-width: " + this.width + "px; height: " + this.height + "px; }",
-    "h2.chartHeader { max-width: " + this.width + "px }",
-    ".xAxis { max-width: " + this.width + "px }",
-    ".yAxis { max-height: " + this.height + "px }",
-    ".xLabels { max-width: " + this.width + "px }",
-    ".bar { width: " + this.barWidth + "%; display:inline-block; margin-left: " + this.spacing + "%; margin-top: " + buffer + "px; }",
-    "span.label { margin-left: " + Math.floor( this.spacing * 0.75) + "%; }"
-
-    ];
+    $('head').append(styleTag);
+    styleTag.append(
+      ".chart { max-width: " + this.width + "px; height: " + this.height + "px; }",
+      "h2.chartHeader { max-width: " + this.width + "px }",
+      ".xAxis { max-width: " + this.width + "px }",
+      ".yAxis { max-height: " + this.height + "px }",
+      ".xLabels { max-width: " + this.width + "px }",
+      ".bar { width: " + this.barWidth + "%; display:inline-block; margin-left: " + this.spacing + "%; margin-top: " + buffer + "px; }",
+      "span.label { margin-left: " + Math.floor( this.spacing * 0.75) + "%; }"
+    );
     var barHeightClasses = []; // Array to store height classes
     var barElements = []; // Store bar HTML elements
     // Get each bar height, give it a class, and create the HTML element.
@@ -131,48 +128,82 @@ function Options (data) {
           } else {
             var backgroundColor = "#009cff";
           }
-          options.push('.b' + i + '-' + x + ' { height: ' + heights[i][x] + 'px; display: inline-block ; background-color: ' + backgroundColor + '; }');
-          options.push('.b' + i + '-' + x + '> b.value-center { top:' + ( ( heights[i][x] / 2 ) - 10) + 'px; }');
+          styleTag.append(
+            '.b' + i + '-' + x + ' { height: ' + heights[i][x] + 'px; display: inline-block ; background-color: ' + backgroundColor + '; }',
+            '.b' + i + '-' + x + ' > b.value-center { top:' + ( ( heights[i][x] / 2 ) - 10) + 'px; }'
+          );
           barHeightClasses[i].push('b' + i + '-' + x);
         }
       } else {
-        options.push('.b' + i + ' { height: ' + heights[i] + 'px; display: inline-block; }');
-        options.push('.b' + i + '> span.valueLabel > b.value-center { top:' + ( ( heights[i] / 2 ) - 10) + 'px; }');
-        barHeightClasses.push('b' + i);
+        styleTag.append(
+          '.b' + i + ' { height: ' + heights[i] + 'px; display: inline-block; }',
+          '.b' + i + ' > span.valueLabel > b.value-center { top:' + ( ( heights[i] / 2 ) - 10) + 'px; }'
+          );
+        barHeightClasses.push('b' + i); // Add to array to be used in next step.
       }
     }
     // create bar html elements
     for (var i in barHeightClasses) {
-      if (isStacked) {
-        var bar = "<div class='bar'>\r\n";
+      if (isStacked) { // Stacked Bars
+        var bar = $("<div></div>").addClass('bar');
         for (var x in barHeightClasses[i]) { // Create
-          bar += "<span class='" + barHeightClasses[i][x] + " value-" + this.xValuesPos + " valueLabel'><b class='value-" + this.xValuesPos + " barLabelColor'>" + this.xValues[i][x] + "</b></span>\r\n";
+          var span = $("<span></span>").addClass( barHeightClasses[i][x] + " value-" + this.xValuesPos + " valueLabel" );
+          var b = $('<b></b>').addClass( "value-" + this.xValuesPos + " barLabelColor" ).text( this.xValues[i][x] );
+          bar.append(span.append(b));
         }
-        bar += "</div>"
-        barElements.push(bar);
-      } else {
-        barElements.push("<div class='bar default " + barHeightClasses[i] + "'><span class='valueLabel'><b class='value-" + this.xValuesPos + " barLabelColor'>" + this.xValues[i] + "</b></span></div>");
+        barElements.push(bar); // Add bar to barElements to be appended to chart.
+      } else { // Single Bars
+        var bar = $("<div></div>").addClass('bar default ' + barHeightClasses[i] );
+        var span = $("<span></span>").addClass( "valueLabel" );
+        var b = $('<b></b>').addClass( "value-" + this.xValuesPos + " barLabelColor" ).text( this.xValues[i] );
+        bar.append(span.append(b));
+        barElements.push(bar); // Add bar to barElements to be appended to chart.
       }
     }
-    barElements.join('\r\n');
-    options.join('\r\n');
 
+    // Create additional Chart Information
     var chartHeader = $('<h2>' + this.title + '</h2>').addClass('chartHeader');
     var yAxisLabel = $('<div></div>').addClass('yAxis').append('<span>' + this.yAxis + '</span>');
-    var chart = $('<div></div>').addClass('chart ' + this.theme).html(barElements);
+    var chart = $('<div></div>').addClass('chart ' + this.theme);
+    // Append Bar Elements
+    for (var i in barElements) {
+    chart.append(barElements[i]);
+    }
     var xAxisLabel = $('<div>' + this.xAxis + '</div>').addClass('xAxis');
     var barXLabels = $('<div></div>').addClass('xLabels');
     for (var i in this.xLabels) {
       barXLabels.append($('<span>' + this.xLabels[i] + '</span>').addClass('label ' + this.theme));
     }
-
-    styleTag.html(options);
+    // Add Default/Custom styles
     // Add styling to new style element in head tag.
-    $('head').append(styleTag);
     $(target).append(chartHeader, yAxisLabel, chart, barXLabels, xAxisLabel);
     $(target).addClass("target");
-  }
+    }
 
+}
+
+function shortenNum (x) {
+// Returns Larger numbers with the suffix of M (Mil), K (Thousand) or '' (Less than 1000)
+  if (x > 1000000) {
+    return Math.floor(x / 1000000) + "M"
+  }  else if (x > 1000) {
+    return Math.floor(x / 1000) + "K"
+  } else {
+    return x;
+  }
+}
+
+function getYLabels (maxNum) {
+  var yLabels = []; // Store Incrememnts
+  // determine how much to decrement
+  var decrement = (maxNum > 1000 && maxNum % 10 !== 0) ? Math.floor(maxNum / 20) : (maxNum > 1000 || maxNum % 10 === 0) ? maxNum / 10 : (maxNum > 10 && maxNum < 100) ? 5 : 2;
+  var i = maxNum;
+  while ( i > 0 ) {
+      yLabels.push(i);
+      i -= decrement;
+  }
+  yLabels = yLabels.map( x => shortenNum(x) );
+  return yLabels;
 }
 
 function getXLabels(xLabels, length, customLabels) {
@@ -279,20 +310,10 @@ function absoluteMin(data) {
   return Math.max(...data); // If there are no arrays, return the max.
 }
 
+ console.log("REGULAR: ", drawBarChart([3,6,7,8], {title: "Western Bugdet Hotels", xLabels: ['June', 'July', 'Aug', 'Sept'], xAxis: "Years", yAxis: "Growth %"}, '.bar-chart'));
 
+console.log("REGULAR: ", drawBarChart([[3,4],[6,7],[7,2], [8,5]], {title: "BMO Mutual Fund Projections", xLabels: [2016,2017,2018,2019], xAxis: "Years", yAxis: "Growth %"}, '#bar-chart'));
 
-/*console.log(drawBarChart([1,2,3], {"name":"object"}, function() {}));
-console.log(drawBarChart('data', {"name":"object"}, 'body'));
-console.log(drawBarChart([1,2,3], 'options', 'element'));
-console.log(drawBarChart([1,2,3], {"name":"object"}, 'element'));
-console.log(drawBarChart([2,3,4,5,6,7,8,9], '', 'element'));
-*/
-//console.log("REGULAR: ", drawBarChart([3,6,7,8], '', 'element'));
-//console.log("CUSTOM OPTIONS: ", drawBarChart([[3,6], [1,2,3], [7,8], [47] , [13,20,4,5]], {width:200, height:500, padding: 32, xLabels: ['May', 'June', 'July', 'Aug', 'Sept']}, '.bar-chart')); // Test setOptions
-//console.log("CUSTOM OPTIONS 2: ", drawBarChart([ [4,2,6,8],[7,8], [1,2,3], [4,2,6,8],[7,8], [1,2,3] ,[4,2,6,8],[7,8], [1,2,3], [4,2,6,8],[7,8], [1,2,3] ], {width:400, height:200}, '.bar-chart')); // Test setOptions
-//console.log("CUSTOM OPTIONS 2: ", drawBarChart([ [4,2,6,8],[7,8], [1,2,3],[7,8], [5,9,8], [1,2,3],[7,8] ], {width:400, height:200}, '.bar-chart')); // Test setOptions
-//console.log(drawBarChart([2,3], '', '.bar-chart'));
-//console.log("REGULAR: ", drawBarChart([3,6,7,8], '', '.bar-chart'));
-console.log("REGULAR: ", drawBarChart([3,6,7,8], {xLabels: ['June', 'July', 'Aug', 'Sept'], xAxis: "Years", yAxis: "Growth %"}, '.bar-chart'));
+console.log("REGULAR: ", drawBarChart([[3,4],[6,7],[7,2], [8,5]], {title: "MK Ultra", xLabels: ["Cohort 1","Cohort 2","Cohort 3","Cohort 4"], xAxis: "", yAxis: "Telekinetic Development"}, 'p'));
 
-console.log("REGULAR: ", drawBarChart([[3,4],[6,7],[7,2], [8,5]], {xLabels: [2016,2017,2018,2019], xAxis: "Years", yAxis: "Growth %"}, '.bar-chart2'));
+drawBarChart([4.2,4.6,5.5,6.2], {title: "My Height as I aged.", xLabels: ["11","12","13","14"], xAxis: "Age", yAxis: "Height (Ft)"}, 'p[data-index="2"]');
