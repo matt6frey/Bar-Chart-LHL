@@ -24,11 +24,8 @@ function drawBarChart(data, options, element) { // Draw Chart.
     return;
   }
 
-  chartOptions.render(target, chartOptions.barHeights(data), isStackedData(data)); // Create Bar Chart
-
-  //console.log(chartOptions);
-  //console.log(chartOptions.barHeights(data));
-  return chartOptions;
+  chartOptions.render(target, chartOptions.barHeights(data), isStackedData(data), chartOptions); // Create Bar Chart
+  //return chartOptions;
 }
 
 function checkErrors(errorCheck, dataCheck) {
@@ -65,14 +62,13 @@ function Options (data) {
   this.theme = "default";
 
   // Chart & Bar Dimensions
-  this.usePercent = false;
-  this.padding = 16;
   this.height = 300;
   this.width = 400;
-  this.barWidth = Math.floor( this.width / (data.length) ); // Get total data length and account for space.
-  this.spacing = this.barWidth / 2; // Spacing to separate bars.
+  this.topBuffer = this.height * 0.05;
+  this.barWidth = Math.floor( this.width / (data.length * 2 ) ); // Get total data length and account for space.
+  this.spacing = (data.length > 10) ? ( this.width - ( this.barWidth * data.length ) ) / data.length : ( this.width - ( this.barWidth * data.length ) ) / ( data.length * 2 ); // Spacing to separate bars.
 
-  this.barHeights = function (data) { // Need to fix this part. Returns undefined and does nothing...
+  this.barHeights = function (data) {
       var dataHeights = []; // Store bar heights
       var height = this.height * 0.95;
       //var maxValue = absoluteMax(data); // Check for stacked values or single values, and Get highest value within data.
@@ -105,58 +101,68 @@ function Options (data) {
     return data.reduce(function (total, pos) { total + pos; } );
   }*/
 
-  this.render = function(target, heights, isStacked) {
+  this.render = function(target, heights, isStacked, chartOptions) {
     var styleTag = $('<style></style>'); // Create element with jQuery
     // Styling and chart styles to be stored.
+    var buffer = chartOptions.topBuffer;
+    console.log(buffer);
     var options = [
     ".chart { margin: 1rem; display: block; width: 100%; height: 100%; max-width: " + this.width + "px !important; height: " + this.height + "px !important; }",
-    ".bar { width: " + this.barWidth + "px; display:inline-block; margin-left: " + this.padding + "px; }",
-    ".bar:first-child { margin-left: " + this.padding / 2 + "px; }"
+    ".bar { width: " + this.barWidth + "px; display:inline-block; margin-left: " + this.spacing * 2 + "px; margin-top: " + buffer + "px; }",
+    ".bar:first-child { width: " + this.barWidth + "px; display:inline-block; margin-left: " + this.spacing + "px; margin-top: " + buffer + "px ; }"
 
     ];
     var barHeightClasses = []; // Array to store height classes
-    // Get each bar height and give it a class.
-    var barElements = [];
+    var barElements = []; // Store bar HTML elements
+    // Get each bar height, give it a class, and create the HTML element.
     for (var i in heights) {
       if(isStacked) {
         barHeightClasses.push([]);
         for (var x in heights[i]) {
-          if(x % 2 === 0) { // Tmp bg
-            var backgroundColor = "blue";
+          if(x % 2 === 0) { // bg
+            var backgroundColor = "#0042fe";
           } else {
-            var backgroundColor = "forestgreen";
+            var backgroundColor = "#009cff";
           }
           options.push('.b' + i + '-' + x + ' { height: ' + heights[i][x] + 'px; display: inline-block ; background-color: ' + backgroundColor + '; }');
           options.push('.b' + i + '-' + x + '> b.value-center { top:' + ( ( heights[i][x] / 2 ) - 10) + 'px; }');
           barHeightClasses[i].push('b' + i + '-' + x);
         }
       } else {
-        var backgroundColor = "forestgreen";
-        options.push('.b' + i + ' { height: ' + heights[i] + 'px; display: inline-block ; background-color: ' + backgroundColor + '; }');
-        barHeightClasses.push('.b' + i);
+        options.push('.b' + i + ' { height: ' + heights[i] + 'px; display: inline-block; }');
+        options.push('.b' + i + '> span.valueLabel > b.value-center { top:' + ( ( heights[i] / 2 ) - 10) + 'px; }');
+        barHeightClasses.push('b' + i);
       }
     }
     // create bar html elements
     for (var i in barHeightClasses) {
       if (isStacked) {
-        console.log(barHeightClasses);
-        var bar = "<div class='bar default'>\r\n";
+        var bar = "<div class='bar'>\r\n";
         for (var x in barHeightClasses[i]) { // Create
           bar += "<span class='" + barHeightClasses[i][x] + " value-" + this.xValuesPos + " valueLabel'><b class='value-" + this.xValuesPos + " barLabelColor'>" + this.xValues[i][x] + "</b></span>\r\n";
         }
         bar += "</div>"
         barElements.push(bar);
       } else {
-        barElements.push("<div class='bar default" + barHeightClasses[i] + "'><span class='valueLabel'><b class='value-" + this.xValuesPos + " barLabelColor'>" + this.xValues[i] + "</b></span></div>");
+        barElements.push("<div class='bar default " + barHeightClasses[i] + "'><span class='valueLabel'><b class='value-" + this.xValuesPos + " barLabelColor'>" + this.xValues[i] + "</b></span></div>");
       }
     }
     barElements.join('\r\n');
     options.join('\r\n');
+
+    var chartHeader = $('<h2>' + this.title + '</h2>').addClass('chartHeader');
+    var yAxisLabel = $('<div>' + this.yAxis + '</div>').addClass('yAxis');
+    var chart = $('<div></div>').addClass('chart ' + this.theme).html(barElements);
+    var xAxisLabel = $('<div>' + this.xAxis + '</div>').addClass('xAxis');
+    var barXLabels = $('<div></div>').addClass('xLabels');
+    for (var i in this.xLabels) {
+      barXLabels.append($('<span>' + this.xLabels[i] + '</span>').addClass('label ' + this.theme));
+    }
+
     styleTag.html(options);
     // Add styling to new style element in head tag.
     $('head').append(styleTag);
-    $(target).addClass('chart', 'default');
-    $(target).html(barElements);
+    $(target).append(chartHeader, yAxisLabel, chart, barXLabels, xAxisLabel);
   }
 
 }
@@ -196,7 +202,7 @@ function setOptions (data, options) {
   }
   for (var property in options) {
     if(acceptableProperties.includes(property)) {
-      if(property.search('xLabels') === 0) {
+      if(property.search('xLabels') === 0 && options[property] !== chartOptions[property]) {
         chartOptions[property] = getXLabels(options[property], data.length, true); // Create new Labels
       } else {
         chartOptions[property] = options[property];
@@ -271,9 +277,9 @@ function absoluteMin(data) {
 console.log(drawBarChart('data', {"name":"object"}, 'body'));
 console.log(drawBarChart([1,2,3], 'options', 'element'));
 console.log(drawBarChart([1,2,3], {"name":"object"}, 'element'));
-console.log(drawBarChart([2,3], '', 'element'));
 console.log(drawBarChart([2,3,4,5,6,7,8,9], '', 'element'));
 */
 //console.log("REGULAR: ", drawBarChart([3,6,7,8], '', 'element'));
-console.log("CUSTOM OPTIONS: ", drawBarChart([[3,6], [1,2,3], [7,8]], {width:500, height:400, padding: 32, xLabels: ['May', 'June', 'July']}, '.bar-chart')); // Test setOptions
-console.log("CUSTOM OPTIONS: ", drawBarChart([[3,6], [1,2,3], [7,8]], {width:500, height:400, padding: 32, xLabels: [2016, 2017, 2018]}, 'element')); // Test setOptions
+//console.log("CUSTOM OPTIONS: ", drawBarChart([[3,6], [1,2,3], [7,8], [47] , [13,20,4,5]], {width:200, height:500, padding: 32, xLabels: ['May', 'June', 'July', 'Aug', 'Sept']}, '.bar-chart')); // Test setOptions
+console.log("CUSTOM OPTIONS 2: ", drawBarChart([ [4,2,6,8],[7,8], [1,2,3],[7,8], [5,9,8], [1,2,3],[7,8] ], {width:500, height:400}, '.bar-chart')); // Test setOptions
+//console.log(drawBarChart([2,3], '', '.bar-chart'));
