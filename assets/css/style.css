@@ -1,14 +1,61 @@
 /* Bar Styling */
 
+.target {
+  margin-left: 1rem;
+}
+
 .chart {
   border-left: 3px solid #000;
   border-bottom: 3px solid #000;
+  display: inline-block;
+  margin: 1rem;
+  width: 100%;
+  margin-left: 1rem;
+  left: 1rem;
+  position: relative;
 }
 
-.chart .negatives {
-
+h2.chartHeader {
+  text-align : center;
+  margin-left: 1rem;
 }
 
+span.label {
+  color: #666;
+  display: inline-block;
+  outline: solid 1px black;
+  padding: 0.5rem;
+  transform: rotate(-45deg);
+  transform-origin: right top;
+}
+
+.xLabels {
+    margin-left: 1rem;
+}
+
+.xAxis {
+  margin-top: 0.5rem;
+  padding: 1rem 0;
+  text-align: center;
+  margin-left: 1rem;
+}
+
+div.yAxis {
+    width: 300px;
+    transform: rotate(-90deg);
+    transform-origin: 100% bottom;
+    position: relative;
+    left: -300px;
+    margin-left: 1rem;
+}
+
+.yAxis > span {
+  display: inline-block;
+  position: relative;
+  margin-right: -1rem;
+  bottom: 30%;
+  text-align: center;
+}
 
 .default {}
 
@@ -20,9 +67,6 @@ div.bar.default {
   background-color: #429ef4;
 }
 
-.label .default {
-  color: #666;
-}
 
 div.bar > span {
   float: left;
@@ -56,7 +100,6 @@ b.barLabelColor {
 .value-bottom {
   bottom: 1rem;
 }
-
 
 /*this.barColor = "#429ef4";
   this.barLabelColor = '#fff';

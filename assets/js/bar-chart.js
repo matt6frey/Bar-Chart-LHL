@@ -65,8 +65,11 @@ function Options (data) {
   this.height = 300;
   this.width = 400;
   this.topBuffer = this.height * 0.05;
-  this.barWidth = Math.floor( this.width / (data.length * 2 ) ); // Get total data length and account for space.
-  this.spacing = (data.length > 10) ? ( this.width - ( this.barWidth * data.length ) ) / data.length : ( this.width - ( this.barWidth * data.length ) ) / ( data.length * 2 ); // Spacing to separate bars.
+  this.barWidth = Math.floor( ( ( this.width / (data.length * 2 ) ) / this.width ) * 100 ) ; // Get total data length and account for space.
+  this.spacing = this.barWidth; // Spacing to separate bars.
+
+  //this.spacing = (data.length > 10) ? ( this.width - ( this.barWidth * data.length ) ) / data.length : ( this.width - ( this.barWidth * data.length ) ) / ( data.length * 2 ); // Spacing to separate bars.
+  console.log(this.barWidth, this.spacing)
 
   this.barHeights = function (data) {
       var dataHeights = []; // Store bar heights
@@ -105,11 +108,15 @@ function Options (data) {
     var styleTag = $('<style></style>'); // Create element with jQuery
     // Styling and chart styles to be stored.
     var buffer = chartOptions.topBuffer;
-    console.log(buffer);
+    //console.log(buffer);
     var options = [
-    ".chart { margin: 1rem; display: block; width: 100%; height: 100%; max-width: " + this.width + "px !important; height: " + this.height + "px !important; }",
-    ".bar { width: " + this.barWidth + "px; display:inline-block; margin-left: " + this.spacing * 2 + "px; margin-top: " + buffer + "px; }",
-    ".bar:first-child { width: " + this.barWidth + "px; display:inline-block; margin-left: " + this.spacing + "px; margin-top: " + buffer + "px ; }"
+    ".chart { max-width: " + this.width + "px; height: " + this.height + "px; }",
+    "h2.chartHeader { max-width: " + this.width + "px }",
+    ".xAxis { max-width: " + this.width + "px }",
+    ".yAxis { max-height: " + this.height + "px }",
+    ".xLabels { max-width: " + this.width + "px }",
+    ".bar { width: " + this.barWidth + "%; display:inline-block; margin-left: " + this.spacing + "%; margin-top: " + buffer + "px; }",
+    "span.label { margin-left: " + Math.floor( this.spacing * 0.75) + "%; }"
 
     ];
     var barHeightClasses = []; // Array to store height classes
@@ -151,7 +158,7 @@ function Options (data) {
     options.join('\r\n');
 
     var chartHeader = $('<h2>' + this.title + '</h2>').addClass('chartHeader');
-    var yAxisLabel = $('<div>' + this.yAxis + '</div>').addClass('yAxis');
+    var yAxisLabel = $('<div></div>').addClass('yAxis').append('<span>' + this.yAxis + '</span>');
     var chart = $('<div></div>').addClass('chart ' + this.theme).html(barElements);
     var xAxisLabel = $('<div>' + this.xAxis + '</div>').addClass('xAxis');
     var barXLabels = $('<div></div>').addClass('xLabels');
@@ -163,6 +170,7 @@ function Options (data) {
     // Add styling to new style element in head tag.
     $('head').append(styleTag);
     $(target).append(chartHeader, yAxisLabel, chart, barXLabels, xAxisLabel);
+    $(target).addClass("target");
   }
 
 }
@@ -281,5 +289,10 @@ console.log(drawBarChart([2,3,4,5,6,7,8,9], '', 'element'));
 */
 //console.log("REGULAR: ", drawBarChart([3,6,7,8], '', 'element'));
 //console.log("CUSTOM OPTIONS: ", drawBarChart([[3,6], [1,2,3], [7,8], [47] , [13,20,4,5]], {width:200, height:500, padding: 32, xLabels: ['May', 'June', 'July', 'Aug', 'Sept']}, '.bar-chart')); // Test setOptions
-console.log("CUSTOM OPTIONS 2: ", drawBarChart([ [4,2,6,8],[7,8], [1,2,3],[7,8], [5,9,8], [1,2,3],[7,8] ], {width:500, height:400}, '.bar-chart')); // Test setOptions
+//console.log("CUSTOM OPTIONS 2: ", drawBarChart([ [4,2,6,8],[7,8], [1,2,3], [4,2,6,8],[7,8], [1,2,3] ,[4,2,6,8],[7,8], [1,2,3], [4,2,6,8],[7,8], [1,2,3] ], {width:400, height:200}, '.bar-chart')); // Test setOptions
+//console.log("CUSTOM OPTIONS 2: ", drawBarChart([ [4,2,6,8],[7,8], [1,2,3],[7,8], [5,9,8], [1,2,3],[7,8] ], {width:400, height:200}, '.bar-chart')); // Test setOptions
 //console.log(drawBarChart([2,3], '', '.bar-chart'));
+//console.log("REGULAR: ", drawBarChart([3,6,7,8], '', '.bar-chart'));
+console.log("REGULAR: ", drawBarChart([3,6,7,8], {xLabels: ['June', 'July', 'Aug', 'Sept'], xAxis: "Years", yAxis: "Growth %"}, '.bar-chart'));
+
+console.log("REGULAR: ", drawBarChart([[3,4],[6,7],[7,2], [8,5]], {xLabels: [2016,2017,2018,2019], xAxis: "Years", yAxis: "Growth %"}, '.bar-chart2'));
