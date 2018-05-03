@@ -59,6 +59,23 @@ function Options (data) {
   this.yAxis = 'Y Axis';
   this.yLabels = getYLabels(absoluteMax(data));
 
+  //Title custom options
+  this.titleSize = 1;
+  this.titleFont = '';
+  this.titleColor = '#000';
+  this.titleClass = '';
+
+  // Bar custom options
+  this.barColor = ''; // default
+  this.barColors = ''; // default
+  this.barColorLabels = ''; // default
+
+  //X Axis custom options
+  this.xLabelColor = ''; // default
+  //Y Axis custom options
+  this.yLabelsColor = ''; // default
+
+
   // Chart Theme (Controls theme colors: ensures either default classes are used or custom classes are used)
   this.theme = "default";
 
@@ -252,8 +269,7 @@ function setOptions (data, options) {
     }
   }
 
-  return chartOptions;
-  //(window.innerWidth * 0.8) + defaults.padding; // 80% of browser element width.
+  return chartOptions; // Return customized options
 }
 
 
@@ -293,8 +309,6 @@ function absoluteMax(data, isStacked) {
 }
 
 function absoluteMin(data) {
-  // (data === [1,2,3] || data === [[1,2,3], 2, [1,2,3]]) ?
-  // If data contains arrays, check all arrays and find the min within them, then compare the absolute highest and return it.
   var minCollection = [];
   var min = data.map( x => jQuery.type(x) === 'array').includes(true); // Determines if an array is present in data.
   if(min) {
@@ -307,13 +321,13 @@ function absoluteMin(data) {
     }
     return Math.min(...minCollection); // Return highest out of all numbers.
   }
-  return Math.max(...data); // If there are no arrays, return the max.
+  return Math.min(...data); // If there are no arrays, return the max.
 }
 
- console.log("REGULAR: ", drawBarChart([3,6,7,8], {title: "Western Bugdet Hotels", xLabels: ['June', 'July', 'Aug', 'Sept'], xAxis: "Years", yAxis: "Growth %"}, '.bar-chart'));
+drawBarChart([3,6,7,8], {title: "Western Bugdet Hotels", xLabels: ['June', 'July', 'Aug', 'Sept'], xAxis: "Years", yAxis: "Growth %"}, '.bar-chart');
 
-console.log("REGULAR: ", drawBarChart([[3,4],[6,7],[7,2], [8,5]], {title: "BMO Mutual Fund Projections", xLabels: [2016,2017,2018,2019], xAxis: "Years", yAxis: "Growth %"}, '#bar-chart'));
+drawBarChart([[3,4],[6,7],[7,2], [8,5]], {title: "BMO Mutual Fund Projections", xLabels: [2016,2017,2018,2019], xAxis: "Years", yAxis: "Growth %"}, '#bar-chart');
 
-console.log("REGULAR: ", drawBarChart([[3,4],[6,7],[7,2], [8,5]], {title: "MK Ultra", xLabels: ["Cohort 1","Cohort 2","Cohort 3","Cohort 4"], xAxis: "", yAxis: "Telekinetic Development"}, 'p'));
+drawBarChart([[3,4],[6,7],[7,2], [8,5]], {title: "MK Ultra", xLabels: ["Cohort 1","Cohort 2","Cohort 3","Cohort 4"], xAxis: "", yAxis: "Telekinetic Development"}, 'p');
 
 drawBarChart([4.2,4.6,5.5,6.2], {title: "My Height as I aged.", xLabels: ["11","12","13","14"], xAxis: "Age", yAxis: "Height (Ft)"}, 'p[data-index="2"]');
