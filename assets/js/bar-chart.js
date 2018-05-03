@@ -47,7 +47,7 @@ function checkErrors(errorCheck, dataCheck) {
 }
 
 function Options (data) {
-// Get Default options for Charts.
+// Create Options object for Charts.
 // Note: Object Constructor Function
 
   // Chart Titles & Labels
@@ -59,24 +59,29 @@ function Options (data) {
   this.yAxis = 'Y Axis';
   this.yLabels = getYLabels(absoluteMax(data));
 
+  // Chart custom options
+  this.chartColor = '#fff';
+  this.chartBorder = 'initial';
+
   //Title custom options
-  this.titleSize = 1;
-  this.titleFont = '';
+  this.titleSize = 'initial';
+  this.titleFont = 'initial';
   this.titleColor = '#000';
   this.titleClass = '';
 
   // Bar custom options
-  this.barColor = ''; // default
-  this.barColors = ''; // default
-  this.barColorLabels = ''; // default
+  this.barColors = 'initial'; // default
+  this.barColorLabels = 'initial'; // default
 
   //X Axis custom options
-  this.xLabelColor = ''; // default
+  this.xLabelsColor = 'initial'; // default
+  this.xAxisColor = 'initial'; // default
+
   //Y Axis custom options
-  this.yLabelsColor = ''; // default
+  this.yLabelsColor = 'initial'; // default
+  this.yAxisLabelColor = 'initial'; // default
 
-
-  // Chart Theme (Controls theme colors: ensures either default classes are used or custom classes are used)
+  // theme type
   this.theme = "default";
 
   // Chart & Bar Dimensions
@@ -114,24 +119,22 @@ function Options (data) {
 
   this.dataMax = absoluteMax(data);
   this.dataMin = absoluteMin(data);
-  /*this.dataAverage = function () {
-    return data.reduce(function (total, pos) { total + pos; } );
-  }*/
 
-  this.render = function(target, heights, isStacked, chartOptions) {
+  this.render = function(target, heights, isStacked, chartOptions) { // delete chartOptions after finished.
     var styleTag = $('<style></style>'); // Create element with jQuery
     // Styling and chart styles to be stored.
     var buffer = this.topBuffer;
     //console.log(buffer);
     $('head').append(styleTag);
+    var chartName = getChartName(this.title);
     styleTag.append(
-      ".chart { max-width: " + this.width + "px; height: " + this.height + "px; }",
-      "h2.chartHeader { max-width: " + this.width + "px }",
-      ".xAxis { max-width: " + this.width + "px }",
-      ".yAxis { max-height: " + this.height + "px }",
-      ".xLabels { max-width: " + this.width + "px }",
-      ".bar { width: " + this.barWidth + "%; display:inline-block; margin-left: " + this.spacing + "%; margin-top: " + buffer + "px; }",
-      "span.label { margin-left: " + Math.floor( this.spacing * 0.75) + "%; }"
+      "." + chartName + " .chart { max-width: " + this.width + "px; height: " + this.height + "px; background-color: " + this.chartColor + "; border: " + this.charBorder + "; }",
+      "." + chartName + " > h2.chartHeader { max-width: " + this.width + "px; font-size: " + this.titleSize +"; font-family: " + this.titleFont + "; color: " + this.titleColor + "; }",
+      "." + chartName + " > .xAxis { max-width: " + this.width + "px; color: " + this.xAxisColor + "; }",
+      "." + chartName + " > .yAxis { max-height: " + this.height + "px; color: " + this.yLabelsColor + ";}",
+      "." + chartName + " > .xLabels { max-width: " + this.width + "px; color: " + this.xLabelsColor + ";}",
+      "." + chartName + " > .bar { width: " + this.barWidth + "%; display:inline-block; margin-left: " + this.spacing + "%; margin-top: " + buffer + "px; }",
+      "." + chartName + " > span.label { margin-left: " + Math.floor( this.spacing * 0.75) + "%; color: " + this.xLabelsColor + "; }"
     );
     var barHeightClasses = []; // Array to store height classes
     var barElements = []; // Store bar HTML elements
@@ -139,24 +142,33 @@ function Options (data) {
     for (var i in heights) {
       if(isStacked) {
         barHeightClasses.push([]);
+        var s = 0;
         for (var x in heights[i]) {
-          if(x % 2 === 0) { // bg
-            var backgroundColor = "#0042fe";
+          if(this.barColors === 'initial') {
+            if(x % 2 === 0) { // bg
+              var backgroundColor = "#0042fe";
+            } else {
+              var backgroundColor = "#009cff";
+            }
           } else {
-            var backgroundColor = "#009cff";
+            s = (s > this.barColors.length) ? 0 : s;
+            var backgroundColor = this.barColors[s];
+            s++;
           }
           styleTag.append(
-            '.b' + i + '-' + x + ' { height: ' + heights[i][x] + 'px; display: inline-block ; background-color: ' + backgroundColor + '; }',
-            '.b' + i + '-' + x + ' > b.value-center { top:' + ( ( heights[i][x] / 2 ) - 10) + 'px; }'
+            "." + chartName + ' .b' + i + '-' + x + ' { height: ' + heights[i][x] + 'px; display: inline-block ; background-color: ' + backgroundColor + '; }',
+            "." + chartName + ' .b' + i + '-' + x + ' > b.value-center { top:' + ( ( heights[i][x] / 2 ) - 10) + 'px; }'
           );
-          barHeightClasses[i].push('b' + i + '-' + x);
+          barHeightClasses[i].push( chartName + ' b' + i + '-' + x);
         }
       } else {
+        //Use custom colors if present
+        var backgroundColor = (this.barColors === 'initial') ? '' : 'background-color: ' + this.barColors[i] + ';';
         styleTag.append(
-          '.b' + i + ' { height: ' + heights[i] + 'px; display: inline-block; }',
-          '.b' + i + ' > span.valueLabel > b.value-center { top:' + ( ( heights[i] / 2 ) - 10) + 'px; }'
+          "." + chartName + ' .b' + i + ' { height: ' + heights[i] + 'px; display: inline-block; ' + backgroundColor + ' }',
+          "." + chartName + ' .b' + i + ' > span.valueLabel > b.value-center { top:' + ( ( heights[i] / 2 ) - 10) + 'px; }'
           );
-        barHeightClasses.push('b' + i); // Add to array to be used in next step.
+        barHeightClasses.push( chartName + ' b' + i); // Add to array to be used in next step.
       }
     }
     // create bar html elements
@@ -170,7 +182,8 @@ function Options (data) {
         }
         barElements.push(bar); // Add bar to barElements to be appended to chart.
       } else { // Single Bars
-        var bar = $("<div></div>").addClass('bar default ' + barHeightClasses[i] );
+        var defaultClass = (this.barColors === 'initial') ? 'default' : '';
+        var bar = $("<div></div>").addClass('bar ' + defaultClass + ' ' + barHeightClasses[i] );
         var span = $("<span></span>").addClass( "valueLabel" );
         var b = $('<b></b>').addClass( "value-" + this.xValuesPos + " barLabelColor" ).text( this.xValues[i] );
         bar.append(span.append(b));
@@ -181,7 +194,7 @@ function Options (data) {
     // Create additional Chart Information
     var chartHeader = $('<h2>' + this.title + '</h2>').addClass('chartHeader');
     var yAxisLabel = $('<div></div>').addClass('yAxis').append('<span>' + this.yAxis + '</span>');
-    var chart = $('<div></div>').addClass('chart ' + this.theme);
+    var chart = $('<div></div>').addClass('chart ' + this.theme + ' ' + chartName);
     // Append Bar Elements
     for (var i in barElements) {
     chart.append(barElements[i]);
@@ -194,9 +207,22 @@ function Options (data) {
     // Add Default/Custom styles
     // Add styling to new style element in head tag.
     $(target).append(chartHeader, yAxisLabel, chart, barXLabels, xAxisLabel);
-    $(target).addClass("target");
+    $(target).addClass("target " + chartName);
     }
 
+}
+
+function getChartName(title) {
+  title = title.split(' ');
+  var result ='';
+  for (var i = 0; i < title.length; i++ ) {
+    if(i > 0) {
+      result += title[i][0].toUpperCase() + title[i].slice(1);
+    } else {
+      result += title[i];
+    }
+  }
+  return result;
 }
 
 function shortenNum (x) {
@@ -235,8 +261,8 @@ function getXLabels(xLabels, length, customLabels) {
     }
     return false;
   } else {
-    var isDefault = xLabels.map( x => typeof x ).includes('number');
-    if(isDefault && customLabels !== true) {
+    //var isDefault = xLabels.map( x => typeof x ).includes('number');
+    if(customLabels !== true) {
       for (var i in xLabels) {
         labels.push("b" + i);
       }
@@ -324,10 +350,6 @@ function absoluteMin(data) {
   return Math.min(...data); // If there are no arrays, return the max.
 }
 
-drawBarChart([3,6,7,8], {title: "Western Bugdet Hotels", xLabels: ['June', 'July', 'Aug', 'Sept'], xAxis: "Years", yAxis: "Growth %"}, '.bar-chart');
+drawBarChart([[1,3,4,2],[6,1,7,2],[7,2,3,1], [8,5,1,4]], {title: "MK Ultra", barColors: ["red","darkorange", "orange", "yellow"], xLabels: ["Cohort 1","Cohort 2","Cohort 3","Cohort 4"], xAxis: "", yAxis: "Telekinetic Development"}, '#bar-chart');
 
-drawBarChart([[3,4],[6,7],[7,2], [8,5]], {title: "BMO Mutual Fund Projections", xLabels: [2016,2017,2018,2019], xAxis: "Years", yAxis: "Growth %"}, '#bar-chart');
-
-drawBarChart([[3,4],[6,7],[7,2], [8,5]], {title: "MK Ultra", xLabels: ["Cohort 1","Cohort 2","Cohort 3","Cohort 4"], xAxis: "", yAxis: "Telekinetic Development"}, 'p');
-
-drawBarChart([4.2,4.6,5.5,6.2], {title: "My Height as I aged.", xLabels: ["11","12","13","14"], xAxis: "Age", yAxis: "Height (Ft)"}, 'p[data-index="2"]');
+drawBarChart([4.2,4.6,5.5,6.2], {title: "My Height as I aged", titleSize: '2rem', titleFont: "monospace", titleColor: "darkorange", xLabels: ["11","12","13","14"], /*xLabelsColor: 'red',*/ xAxis: "Age", yAxis: "Height (Ft)",  yLabelsColor: 'red' }, 'div[data-index="2"]');
