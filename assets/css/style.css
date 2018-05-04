@@ -24,8 +24,11 @@ span.label {
   color: #666;
   display: inline-block;
   padding: 0.5rem;
-  transform: rotate(-45deg);
+  transform: rotate(-12deg);
   transform-origin: right top;
+  overflow: visible;
+  text-align: right;
+  width: 80px;
 }
 
 .xLabels {
@@ -54,6 +57,19 @@ div.yAxis {
   margin-right: -1rem;
   bottom: 30%;
   text-align: center;
+}
+
+div.yLabels {
+  margin-bottom: 0px;
+  display: inline-block;
+  margin-left: -15px;
+}
+
+span.yLabels {
+  transform: rotate(90deg);
+  display: inline-block;
+  position: absolute;
+  top: 30px;
 }
 
 div.bar.default {
@@ -96,6 +112,7 @@ b.barLabelColor {
 .inline-block {
   display: inline-block;
   margin-left: 2rem;
+  margin-right: 2rem;
 }
 
 

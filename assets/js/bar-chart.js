@@ -49,15 +49,27 @@ function checkErrors(errorCheck, dataCheck) {
 function Options (data) {
 // Create Options object for Charts.
 // Note: Object Constructor Function
+  // theme type
+
+  this.theme = "default";
+
+  // Chart & Bar Dimensions
+  this.height = 300;
+  this.width = 400;
+  this.topBuffer = this.height * 0.05;
+  this.barWidth = Math.floor( ( ( this.width / (data.length * 2 ) ) / this.width ) * 100 ) ; // Get total data length and account for space.
+  this.spacing = this.barWidth; // Spacing to separate bars.
 
   // Chart Titles & Labels
   this.title = 'Chart';
   this.xAxis = 'X Axis';
-  this.xLabels = getXLabels(data, data.length, false); // An array of names for each bar on the chart.
+  this.xLabels = getXLabels(data, data.length, false, this.title); // An array of names for each bar on the chart.
   this.xValues = data;
   this.xValuesPos = 'center'; // Center: Default. Accepts Top or Bottom as well.
+  this.stacked = isStackedData(data);
   this.yAxis = 'Y Axis';
-  this.yLabels = getYLabels(absoluteMax(data));
+  this.yLabels = getYLabels(absoluteMax(data, this.stacked));
+  this.yLabelPositions = yLabelPos(this.yLabels, this.height);
 
   // Chart custom options
   this.chartColor = '#fff';
@@ -81,15 +93,6 @@ function Options (data) {
   this.yLabelsColor = 'initial'; // default
   this.yAxisLabelColor = 'initial'; // default
 
-  // theme type
-  this.theme = "default";
-
-  // Chart & Bar Dimensions
-  this.height = 300;
-  this.width = 400;
-  this.topBuffer = this.height * 0.05;
-  this.barWidth = Math.floor( ( ( this.width / (data.length * 2 ) ) / this.width ) * 100 ) ; // Get total data length and account for space.
-  this.spacing = this.barWidth; // Spacing to separate bars.
 
   this.barHeights = function (data) {
       var dataHeights = []; // Store bar heights
@@ -132,7 +135,7 @@ function Options (data) {
       "." + chartName + " > h2.chartHeader { max-width: " + this.width + "px; font-size: " + this.titleSize +"; font-family: " + this.titleFont + "; color: " + this.titleColor + "; }",
       "." + chartName + " > .xAxis { max-width: " + this.width + "px; color: " + this.xAxisColor + "; }",
       "." + chartName + " > .yAxis { max-height: " + this.height + "px; color: " + this.yLabelsColor + ";}",
-      "." + chartName + " > .xLabels { max-width: " + this.width + "px; color: " + this.xLabelsColor + ";}",
+      "." + chartName + " > .xLabels { max-width: " + this.width + "px; color: " + this.xAxisColor + ";}",
       "." + chartName + " > .bar { width: " + this.barWidth + "%; display:inline-block; margin-left: " + this.spacing + "%; margin-top: " + buffer + "px; }",
       "." + chartName + " > span.label { margin-left: " + Math.floor( this.spacing * 0.75) + "%; color: " + this.xLabelsColor + "; }"
     );
@@ -191,9 +194,22 @@ function Options (data) {
       }
     }
 
+    var titleClass = (this.titleClass === '') ? '' : this.titleClass;
     // Create additional Chart Information
-    var chartHeader = $('<h2>' + this.title + '</h2>').addClass('chartHeader');
+    var chartHeader = $('<h2>' + this.title + '</h2>').addClass('chartHeader ' + titleClass);
+
     var yAxisLabel = $('<div></div>').addClass('yAxis').append('<span>' + this.yAxis + '</span>');
+    var yLabelsDiv = $('<div></div>').addClass('yLabels').css('width', this.height);
+
+    for(var i in this.yLabels) {
+      var yLabel = $('<span></span>').addClass('yLabels');
+      yLabel.text(this.yLabels[i]);
+      yLabel.css('left', this.yLabelPositions[i] + "px");
+       yLabelsDiv.append(yLabel);
+    }
+
+    yAxisLabel.append(yLabelsDiv);
+
     var chart = $('<div></div>').addClass('chart ' + this.theme + ' ' + chartName);
     // Append Bar Elements
     for (var i in barElements) {
@@ -232,8 +248,28 @@ function shortenNum (x) {
   }  else if (x > 1000) {
     return Math.floor(x / 1000) + "K"
   } else {
-    return x;
+    return Math.floor(x);
   }
+}
+
+function yLabelPos(yLabels, height) { //JUMP2
+  console.log(yLabels);
+  //var percent = yLabels.map( x => Math.floor( height / x ) ); // Get percent for position on chart.
+  var positions = []; // positions
+  var max = Math.max(...yLabels);
+  for (var i in yLabels) {
+    if(i === 0) {
+      positions.push(0);
+    } else {
+      var val = yLabels[i] / max;
+      positions.push(val.toFixed(2));
+    }
+  }
+  var buffer = height * 0.05;
+  var positions = positions.map( x => Math.floor(x * ( height / 1.2 )) );
+  console.log("pos" +positions, max);
+
+  return positions;
 }
 
 function getYLabels (maxNum) {
@@ -246,18 +282,19 @@ function getYLabels (maxNum) {
       i -= decrement;
   }
   yLabels = yLabels.map( x => shortenNum(x) );
+  yLabels = yLabels.sort( function (a,b) { return a-b;} ); // Sort Ascending
   return yLabels;
 }
 
-function getXLabels(xLabels, length, customLabels) {
+function getXLabels(xLabels, length, customLabels, chartName) {
   // Will Set the bar labels
 
   var labels = [];
   if(xLabels.length !== length) { // Error: Values don't match.
     if(xLabels.length > length) { // Too many
-      console.log("There are too many labels for each bar on the chart.", "Labels: " + xLabels.length, "Bars: " + length);
+      console.log("There are too many labels for each bar on the chart.", "Labels: " + xLabels.length, "Bars: " + length, ". Chart: " + chartName);
     } else { // Too little.
-      console.log("There aren't enough labels for each bar on the chart.", "Labels: " + xLabels.length, "Bars: " + length);
+      console.log("There aren't enough labels for each bar on the chart.", "Labels: " + xLabels.length, "Bars: " + length, ". Chart: " + chartName);
     }
     return false;
   } else {
@@ -285,7 +322,7 @@ function setOptions (data, options) {
   for (var property in options) {
     if(acceptableProperties.includes(property)) {
       if(property.search('xLabels') === 0 && options[property] !== chartOptions[property]) {
-        chartOptions[property] = getXLabels(options[property], data.length, true); // Create new Labels
+        chartOptions[property] = getXLabels(options[property], data.length, true, options['title']); // Create new Labels
       } else {
         chartOptions[property] = options[property];
       }
@@ -330,8 +367,9 @@ function absoluteMax(data, isStacked) {
       maxCollection.push(sum);
     }
     return Math.max(...maxCollection); // Return highest out of all numbers.
+  } else {
+    return Math.max(...data); // If there are no arrays, return the max.
   }
-  return Math.max(...data); // If there are no arrays, return the max.
 }
 
 function absoluteMin(data) {
@@ -350,6 +388,6 @@ function absoluteMin(data) {
   return Math.min(...data); // If there are no arrays, return the max.
 }
 
-drawBarChart([[1,3,4,2],[6,1,7,2],[7,2,3,1], [8,5,1,4]], {title: "MK Ultra", barColors: ["red","darkorange", "orange", "yellow"], xLabels: ["Cohort 1","Cohort 2","Cohort 3","Cohort 4"], xAxis: "", yAxis: "Telekinetic Development"}, '#bar-chart');
+drawBarChart([[1,3,4,2],[6,1,7,2],[7,2,3,1], [8,5,1,4]], {title: "MK Ultra", barColors: ["red","darkorange", "orange", "chocolate"], xLabels: ["Cohort 1","Cohort 2","Cohort 3","Cohort 4"], xAxis: "", yAxis: "Telekinetic Development"}, '#bar-chart');
 
-drawBarChart([4.2,4.6,5.5,6.2], {title: "My Height as I aged", titleSize: '2rem', titleFont: "monospace", titleColor: "darkorange", xLabels: ["11","12","13","14"], /*xLabelsColor: 'red',*/ xAxis: "Age", yAxis: "Height (Ft)",  yLabelsColor: 'red' }, 'div[data-index="2"]');
+drawBarChart([4.2,4.6,5.5,6.2], {title: "My Height as I aged", titleSize: '2rem', titleFont: "monospace", titleColor: "darkorange", xLabels: ["Age 11","Age 12","Age 13","My cat"], titleClass: 'super-new-amazingly-fun', barColorLabels: ['darkblue','darkpurple','darkorange','darkred'], xLabelsColor: 'red', xAxisColor: 'blue', xAxis: "Age", yAxis: "Height (Ft)",  yLabelsColor: 'red' }, 'div[data-index="2"]');
