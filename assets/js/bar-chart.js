@@ -24,7 +24,7 @@ function drawBarChart(data, options, element) { // Draw Chart.
     return;
   }
 
-  chartOptions.render(target, chartOptions.barHeights(data), isStackedData(data), chartOptions); // Create Bar Chart
+  chartOptions.render(target, chartOptions.barHeights(data), isStackedData(data)); // Create Bar Chart
   //return chartOptions;
 }
 
@@ -97,7 +97,7 @@ function Options (data) {
   this.barHeights = function (data) {
       var dataHeights = []; // Store bar heights
       var height = this.height * 0.95;
-      var isStacked = isStackedData(data);
+      var isStacked = this.stacked;
       if(isStacked) {
         var maxValue = absoluteMax(data, true); // Stacked values: Get highest value within data.
       } else {
