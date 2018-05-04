@@ -29,29 +29,33 @@ This function also has a few error checks to ensure that proper values are being
 
  - theme = *string* 
 
-**// Chart & Bar Dimensions**
+**Chart & Bar Dimensions**
  - height  = *number*
  - width = *number*
  - spacing =  *number*
-**// Chart Titles & Labels**
+
+**Chart Titles & Labels**
  - title = *string* 
  - xAxis = *string*
  - xLabels = *array*
  - xValuesPos = *string* 
  - yAxis = *string* 
-**// Chart custom options**
+
+**Chart custom options**
  - chartColor = *string* 
  - chartBorder = *string* 
-**//Title custom options**
+
+**Title custom options**
  - titleSize = *number* 
  - titleFont = *string* 
  - titleColor = *string* 
  - titleClass = *string* 
-**// Bar custom options**
+
+**Bar custom options**
  - barColors = *array* 
  - barColorLabels = *string* 
 
-**//X Axis custom options**
+**X Axis custom options**
  - xLabelsColor = *string* 
  - xAxisColor = *string* 
   
