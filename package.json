@@ -1,7 +1,7 @@
 {
   "name": "stretch-project-1",
   "version": "0.0.0",
-  "description": "",
+  "description": "This is a Bar Chart Library made to easily implement a chart on the page displaying single or stacked values. 90% of the chart is customizable, so you are free to style it as you wish!",
   "devDependencies": {
     "eslint": "^3.19.0",
     "eslint-config-lighthouselabs": "lighthouse-labs/eslint-config-lighthouselabs"

@@ -8,19 +8,84 @@
     <meta name="Author" content="Matt Frey">
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
   </head>
 
   <body>
-    <div class="bar-chart inline-block"></div>
 
-    <div id="bar-chart" class="inline-block"></div>
+  <div class="container">
+      <h1 class="text-center mb-5">Bar-Chart Library Demo</h1>
+      <section>
+        <div class="mb-5">
+          <div class="content inline-block" style="width:40%; vertical-align: top;">
+            <h2>Default Charts</h2>
+            <p>
+              Default Charts can be implemented by using the function <code>drawBarChart(<em>Array</em>, <em>Object</em>, <em>Element</em>)</code>. For example, this chart was created using the code:
+            </p>
+            <p>
+              <code>
+                drawBarChart(<em>[10, 3, 15 ,16 ,7]</em>, <em>{ title: 'A Default Chart', width: 500 }</em>, <em>'.bar-chart'</em>)
+              </code>
+            </p>
+            <p>Many of the elements within the chart are customizable. </p>
+          </div>
+          <div class="bar-chart inline-block"></div>
+        </div>
+        <div class="mb-5">
+          <div id="custom" class="inline-block" style="float: left;"></div>
+          <div class="content inline-block" style="width:30%; vertical-align: top; float: left;">
+            <h2>The Trouble with TPS Reports</h2>
 
-    <div class="inline-block"><p></p></div>
+            <p>The <em>TPS Reports</em> chart, shows some of the custom styling you can add to your chart.</p>
 
-    <div class="inline-block" data-index="2"></div>
+            <p>
+              It was generated using this code:<br><br>
+              <code>
+                drawBarChart(<em>[10,13 ,16]</em>, <em>{ title: <em>'TPS Reports'</em>, titleSize: <em>1.25</em>, titleColor: <em>"darkred"</em>, chartColor: <em>'ghostwhite'</em>, barColors: <em>['#c04d4d', '#894343', 'darkred']</em>, xLabels: <em>['January', 'February', 'March']</em>, height: <em>400</em>, width: <em>700</em>,  }</em>, <em>'#custom'</em>)
+              </code>
+            </p>
+          </div>
+        </div>
+        <div class="mb-5">
+        <div class="content inline-block" style="width:40%; vertical-align: top;">
+            <h2>Stacked Charts</h2>
+           <p>Stacked charts can be created by giving the <code><em>data</em></code> parameter array values instead of single digits.</p>
 
+            <p>
+              Check out this example code:<br><br>
+              <code>
+                 <em>drawBarChart(<em>[<em>[2,2,3]</em>, <em>[6,4,5]</em>, <em>[8,4,6]</em>, <em>[4,2,3]</em>, <em>[1,2,1]</em>]</em> , { title: <em>"Specie Composition"</em>, xLabels:<em>['Central MixedWood', 'Dry Mixedwood', 'Boreal Highlands', 'Montane', 'Kazan Uplands']</em>, barColors: <em>['lightgreen','green','forestgreen']</em>, yAxis: <em>"Population %"</em>, xAxis: <em>"Subregion"</em>, chartBorder: <em>"#666"</em>} , <em>'div[data-id="my-chart"]'</em>)</em>
+              </code>
+            </p>
 
+          </div>
+          <div data-id="my-chart" class="inline-block"></div>
+        </div>
+        <div class="mb-5">
+          <div class="inline-block treeHeights"></div>
+          <div class="content inline-block" style="width:30%; vertical-align: top;">
+            <h2>Summary</h2>
+
+            <p>The Bar charts library aims to speed up coding charts and provide a simple way to add them to any content.</p>
+
+          </div>
+        </div>
+      </section>
+  </div>
     <script src="assets/js/bar-chart.js"></script>
+    <script>
+      $(document).ready( function () {
+        drawBarChart([10, 3, 15 ,16 ,7], { title: 'A Default Chart', width: 500 }, '.bar-chart');
+
+        drawBarChart([10,13 ,16], { title: 'TPS Reports', titleSize: 1.25, titleColor: "darkred", chartColor: 'ghostwhite', barColors: ['#c04d4d', '#894343', 'darkred'], xLabels: ['January', 'February', 'March'], height: 400, width: 700,  }, '#custom');
+
+        drawBarChart([[2,2,3], [6,4,5], [8,4,6], [4,2,3], [1,2,1]] , { title: "Specie Composition", xLabels:['Central MixedWood', 'Dry Mixedwood', 'Boreal Highlands', 'Montane', 'Kazan Uplands'], barColors: ['lightgreen','green','forestgreen'], yAxis: "Population %", xAxis: "Subregion", chartBorder: "#666"} , 'div[data-id="my-chart"]');
+
+
+        drawBarChart([[50], [40], [15], [30], [24]] , { title: "Maximum Tree Heights in AB", titleFont: 'monospace', xLabels:['Pine', 'W. Spruce', 'B. Spruce', 'Aspen', 'Poplar'], barColors: ['#3f6e3f','green','forestgreen', 'orange','#2ca758'], yAxis: "Maximum Height (m)", xAxis: "Species", xValuesPos: 'bottom', chartBorder: "#666", width: 700, height:250} , '.treeHeights');
+
+        });
+    </script>
   </body>
 
 

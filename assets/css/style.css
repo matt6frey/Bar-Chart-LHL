@@ -1,7 +1,45 @@
-/* Bar Styling */
+/* Basic Styling for Demo */
+
+p {
+  line-height: 1.5rem;
+}
+
+code {
+  padding:0.15rem 0.2rem;
+  background-color: #e7e7e7;
+  color: #666;
+  border-radius: 3px;
+  font-weight:600;
+}
+
+code > em {
+  color: forestgreen;
+}
+
+code > em > em {
+  color: darkgreen;
+}
+
+.container {
+  width: 95%;
+  min-width: 360px;
+  padding: 1rem;
+  margin: 0 auto;
+}
+
+.mb-5 {
+  margin-bottom: 5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Bar-Chart Styling */
 
 .target {
   margin-left: 1rem;
+  display:block;
 }
 
 .chart {
@@ -28,8 +66,12 @@ span.label {
   transform-origin: right top;
   overflow: visible;
   text-align: right;
-  width: 80px;
+  /*width:80px;*/
 }
+
+/*span.label.default {
+  width: 4rem;
+}*/
 
 .xLabels {
     margin-left: 1rem;
@@ -85,9 +127,11 @@ div.bar > span {
 }
 
 div.bar > span > b {
-  position: relative;
+  position: absolute;
   padding: 0;
   margin: 0;
+  margin-left:-15%;
+  text-align:center;
 }
 
 .bar {
@@ -103,10 +147,12 @@ b.barLabelColor {
 
 .value-top {
   top: 1rem;
+  margin-top: -1rem;
 }
 
 .value-bottom {
   bottom: 1rem;
+  margin-top: 1rem;
 }
 
 .inline-block {
