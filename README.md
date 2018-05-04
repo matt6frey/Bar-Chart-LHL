@@ -4,8 +4,8 @@ This is a stretch project within the Lighthouse Labs Prep Work. This library tha
 
 ##### Screenshots
 
-!['A Default Chart created by the Bar Chart Library'] (https://github.com/matt6frey/Bar-Chart-LHL/blob/master/img/default-chart.png)
-!['A Custom Chart created by the Bar Chart Library'] (https://github.com/matt6frey/Bar-Chart-LHL/blob/master/img/stacked-custom.png)
+!['A Default Chart created by the Bar Chart Library'](https://github.com/matt6frey/Bar-Chart-LHL/blob/master/img/default-chart.png "Default Chart")
+!['A Custom Chart created by the Bar Chart Library'](https://github.com/matt6frey/Bar-Chart-LHL/blob/master/img/stacked-custom.png "A Stacked Custom Chart")
 
 ## Functions
 
@@ -149,9 +149,9 @@ At this point, there is only chart generation and customization. The colors, tex
 
 During this project I used the following resources:
 
-- [MDN Web Docs: JavaScript]: https://developer.mozilla.org/bm/docs/Web/JavaScript
-- [MDN Web Docs: jQuery]: https://developer.mozilla.org/en-US/docs/Glossary/jQuery
-- [jQuery API]: https://developer.mozilla.org/en-US/docs/Glossary/jQuery
-- [W3schools]: https://www.w3schools.com/
+- [MDN Web Docs: JavaScript](https://developer.mozilla.org/bm/docs/Web/JavaScript)
+- [MDN Web Docs: jQuery](https://developer.mozilla.org/en-US/docs/Glossary/jQuery)
+- [jQuery API](https://developer.mozilla.org/en-US/docs/Glossary/jQuery)
+- [W3schools](https://www.w3schools.com/)
 
 
