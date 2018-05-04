@@ -27,36 +27,37 @@ This function also has a few error checks to ensure that proper values are being
 
 **options** - Expects an object. If an invalid property is given, the function terminates and and error is displayed in the console. Below are all the customizeable options:
 
- -theme = *string* 
+ - theme = *string* 
+
 **// Chart & Bar Dimensions**
- -height  = *number*
- -width = *number*
- -spacing =  *number*
+ - height  = *number*
+ - width = *number*
+ - spacing =  *number*
 **// Chart Titles & Labels**
- -title = *string* 
- -xAxis = *string*
- -xLabels = *array*
- -xValuesPos = *string* 
- -yAxis = *string* 
+ - title = *string* 
+ - xAxis = *string*
+ - xLabels = *array*
+ - xValuesPos = *string* 
+ - yAxis = *string* 
 **// Chart custom options**
- -chartColor = *string* 
- -chartBorder = *string* 
+ - chartColor = *string* 
+ - chartBorder = *string* 
 **//Title custom options**
- -titleSize = *number* 
- -titleFont = *string* 
- -titleColor = *string* 
- -titleClass = *string* 
+ - titleSize = *number* 
+ - titleFont = *string* 
+ - titleColor = *string* 
+ - titleClass = *string* 
 **// Bar custom options**
- -barColors = *array* 
- -barColorLabels = *string* 
+ - barColors = *array* 
+ - barColorLabels = *string* 
 
 **//X Axis custom options**
- -xLabelsColor = *string* 
- -xAxisColor = *string* 
+ - xLabelsColor = *string* 
+ - xAxisColor = *string* 
   
 **Y Axis custom options**
- -yLabelsColor = *string* 
- -yAxisLabelColor = *string* 
+ - yLabelsColor = *string* 
+ - yAxisLabelColor = *string* 
 
 **Note:** Any color value accepts hexcodes, rgba, and rgb values.
 
