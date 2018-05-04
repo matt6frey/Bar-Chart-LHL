@@ -11,7 +11,9 @@ This is a stretch project within the Lighthouse Labs Prep Work. This library tha
 
 ### drawBarChart Function
 
-`drawBarChart ( **data** = *array*, **options** = *object*, **element** = *string* )`
+```javascript
+drawBarChart ( data = array, options = object, element = string )
+```
 
 This is the main function. It creates the chart. There are other functions within the library but this is the only one required to build a chart.
 
