@@ -1,5 +1,11 @@
 # Lighthouse Labs : Bar Chart Project
+
 This is a stretch project within the Lighthouse Labs Prep Work. This library that enables developers to create bar charts. By using the *drawBarChart* function, developers can enter easily add a chart to any part of the page. 
+
+##### Screenshots
+
+!['A Default Chart created by the Bar Chart Library'] (https://github.com/matt6frey/Bar-Chart-LHL/blob/master/img/default-chart.png)
+!['A Custom Chart created by the Bar Chart Library'] (https://github.com/matt6frey/Bar-Chart-LHL/blob/master/img/stacked-custom.png)
 
 ## Functions
 
